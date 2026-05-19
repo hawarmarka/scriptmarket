@@ -13,6 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
     && docker-php-ext-install -j$(nproc) pdo_mysql mysqli gd zip \
     && a2enmod rewrite headers expires deflate \
+    && sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
     && sed -ri 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && apt-get clean \
@@ -25,6 +26,7 @@ COPY . /var/www/html/
 RUN chown -R www-data:www-data /var/www/html \
     && find /var/www/html -type d -exec chmod 755 {} \; \
     && find /var/www/html -type f -exec chmod 644 {} \; \
+    && if [ -d "/var/www/html/public/uploads" ]; then chmod -R 775 /var/www/html/public/uploads; fi \
     && if [ -d "/var/www/html/uploads" ]; then chmod -R 775 /var/www/html/uploads; fi \
     && if [ -d "/var/www/html/storage" ]; then chmod -R 775 /var/www/html/storage; fi
 
