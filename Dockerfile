@@ -15,6 +15,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && a2enmod rewrite headers expires deflate \
     && sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf \
     && sed -ri 's/AllowOverride None/AllowOverride All/g' /etc/apache2/apache2.conf \
+    && printf '%s\n' \
+        'Alias /admin /var/www/html/admin' \
+        '<Directory /var/www/html/admin>' \
+        '    Options Indexes FollowSymLinks' \
+        '    AllowOverride All' \
+        '    Require all granted' \
+        '</Directory>' \
+        > /etc/apache2/conf-available/scriptmarket-admin.conf \
+    && a2enconf scriptmarket-admin \
     && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
